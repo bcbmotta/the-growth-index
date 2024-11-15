@@ -19,7 +19,7 @@ import base64
 sections = {
     'Business Development': [
         'Do you have sales resources that are exclusively focused on acquiring new customers?',
-        'Do you have a value proposition that succinctly defines your company's competitive advantage?',
+        "Do you have a value proposition that succinctly defines your company's competitive advantage?",
         'Do you have a robust lead generation engine that drives new opportunities?',
         'Does your sales team use a rolling 4-week activity plan to focus their time & results?'
     ],
