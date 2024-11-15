@@ -19,9 +19,9 @@ import base64
 sections = {
     'Business Development': [
         'Do you have sales resources that are exclusively focused on acquiring new customers?',
-        'Do you have a value proposition that succinctly defines your companies competitive advantage?',
+        'Do you have a value proposition that succinctly defines your company's competitive advantage?',
         'Do you have a robust lead generation engine that drives new opportunities?',
-        'Does your sales team use a rolling 4 week activity plan to focus their time & results?'
+        'Does your sales team use a rolling 4-week activity plan to focus their time & results?'
     ],
     'Customer Management': [
         'Do you have a defined and documented process to review the annual performance of your customer base?',
@@ -30,21 +30,21 @@ sections = {
         'Do you measure customer retention?'
     ],
     "KPI's & Reporting": [
-        'Have you established a set if weekly/monthly key performance metrics that you track and monitor?',
+        'Have you established a set of weekly/monthly key performance metrics that you track and monitor?',
         'Do you have an immediate view of your won ⁄ lost record for potential sales for the past 12 months?',
         'Do you have challenges with obtaining weekly reports that deliver key insights to you and your team?',
-        "Does your sales team see value in the established KPI's  and how they can shape their future performance?"
+        "Does your sales team see value in the established KPIs  and how they can shape their future performance?"
     ],
     'Market & Channel': [
-        'Do your growth plans use third party data to establish achievable year over year targets?',
+        'Do your growth plans use third-party data to establish achievable year-over-year targets?',
         'Is your growth plan built by vertical market and product type?',
         'Does your growth planning include an evaluation of your competitors?',
-        'Do you use third party data to define your share of the market by vertical and geography?'
+        'Do you use third-party data to define your market share by vertical and geography?'
     ],
     'People & Leadership': [
         'Do you believe current leadership is performing well?',
         'Do you have low turnover in your sales team?',
-        'Does your sales team understand their monthly activities and measures progress on a weekly basis?',
+        'Does your sales team understand their monthly activities and measure progress on a weekly basis?',
         'Do you have a promote from within culture?'
     ],
     'Pipeline Management': [
@@ -54,15 +54,15 @@ sections = {
         'Do you have a process to actively address stalled or stuck deals in the pipeline?'
     ],
     'Process & Discipline': [
-        'Have you have clearly defined the steps of your sales process from opening an opportunity to closing a deal?',
+        'Have you clearly defined the steps of your sales process from opening an opportunity to closing a deal?',
         'Do you conduct a weekly sales meeting to discuss past and future performance?',
         'Do you have a documented, standard process for deal evaluation & pricing approval?',
         'Does your company routinely use historical data to inform future decisions?'
     ],
     'Sales Forecasting': [
         'Do you use historical sales data as a basis for your sales forecasting?',
-        'Is your forecast built bottom up using a well defined framework?',
-        'Do you incorporate data from your CRM into sales forecasting process?',
+        'Is your forecast built bottom up using a well-defined framework?',
+        'Do you incorporate data from your CRM into the sales forecasting process?',
         'Do you adjust sales forecasts based on changes in your sales pipeline?'
     ],
     'Structure & Compensation': [
@@ -87,21 +87,48 @@ def calculate_scores(responses):
         scores[section] = score
     return scores
 
-# Helper function to generate PDF report
-def generate_pdf_report(company_name, first_name, last_name, position, email, scores):
+# Helper function to generate a PDF report
+def generate_pdf_with_chart(company_name, first_name, last_name, position, email, scores, labels, chart_filename="radar_chart.png"):
+    # Create PDF
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, txt=f"Survey Report for {company_name}", ln=True, align="C")
-    pdf.cell(200, 10, txt=f"Name: {first_name} {last_name}, Position: {position}, Email: {email}", ln=True)
-    pdf.ln(10)
-    
-    # Scores per section
-    for section, score in scores.items():
-        pdf.cell(200, 10, txt=f"{section}: {score} points", ln=True)
-    
+
+    # Logo
+    pdf.image("logo.png", x=(210 - 100) / 2, w=100)  # Centralize the logo (A4 width is 210mm)
+
+    # Title and header
+    pdf.set_font("Arial", "B", 14)
+    pdf.set_text_color(234, 0, 0)  # Set color to HEX #EA0000
+    pdf.cell(200, 10, txt="Growth Index Results", ln=True, align="C")
+
+    pdf.set_font("Arial", size=10)
+    pdf.set_text_color(0, 0, 0)  # Reset to black
+    pdf.multi_cell(0, 10, "Congratulations - you've completed TGC's Growth Assessment! Below is a breakdown of your results by focus area.\n")
+
+    # Insert the radar chart image
+    pdf.ln(5)
+    pdf.image(chart_filename, x=(210 - 140) / 2, w=140)
+
+    # Assessment results breakdown in table format
+    pdf.ln(5)
+    pdf.set_font("Arial", "B", 12)
+    pdf.cell(200, 10, txt="Assessment Results by Focus Area", ln=True)
+
+    # Table header
+    # pdf.set_font("Arial", "B", 10)
+    # pdf.cell(100, 8, txt="Focus Area", border=1, align="C")
+    # pdf.cell(50, 8, txt="Score", border=1, align="C")
+    # pdf.ln()
+
+    # Table rows
+    pdf.set_font("Arial", size=10)
+    for label, score in zip(labels, scores):
+        pdf.cell(100, 8, txt=label, border=1)
+        pdf.cell(50, 8, txt=f"{score}/8", border=1, align="C")
+        pdf.ln()
+
     # Save PDF to file
-    pdf_file = "/tmp/survey_report.pdf"
+    pdf_file = "survey_report.pdf"
     pdf.output(pdf_file)
     return pdf_file
 
@@ -125,7 +152,7 @@ def send_email(from_email, to_email, pdf_file, content):
     try:
         with smtplib.SMTP('smtp.sendgrid.net', 587) as server:
             server.starttls()
-            server.login("apikey", os.getenv(SENDGRID_API_KEY_SMTP))  # Securely retrieve the API key
+            server.login("apikey", os.getenv(SENDGRIP_API_KEY_SMTP))  # Securely retrieve the API key
             server.sendmail(from_email, to_email, msg.as_string())
         print("Email sent successfully.")
     except Exception as e:
@@ -163,7 +190,7 @@ def send_email_with_sendgrid(to_email, subject, content, pdf_file_path):
         print(f"Error sending email to {to_email}: {e}")
 
 # Function to create radar chart
-def create_radial_bar_chart(labels, scores):
+def create_radial_bar_chart(labels, scores, filename="radar_chart.png"):
     # Break labels with more than one word into two lines
     formatted_labels = []
     for label in labels:
@@ -198,10 +225,10 @@ def create_radial_bar_chart(labels, scores):
 
         # Adjust label position to place it just outside the bar
         ax.text(
-            angle + 0.3,                     # Angle position
-            10.1,              # Radius position outside the maximum score
-            label,                     # Text of the label
-            ha='center', va='center',  # Centered alignment
+            angle + 0.3,                # Angle position
+            10.1,                       # Radius position outside the maximum score
+            label,                      # Text of the label
+            ha='center', va='center',   # Centered alignment
             fontsize=10,
         )
 
@@ -211,6 +238,10 @@ def create_radial_bar_chart(labels, scores):
 
     # Remove radial labels for a cleaner look
     ax.set_yticklabels([])
+
+    # Create image
+    plt.savefig(filename, format='png', bbox_inches='tight')
+    plt.close()
 
     # Display the plot
     st.pyplot(fig)
@@ -259,7 +290,7 @@ if st.button("Submit Survey"):
             "Position": position,
             "Email": email
         }
-        pdf_file = generate_pdf_report(company_name, first_name, last_name, position, email, scores)
+        pdf_file = generate_pdf_with_chart(company_name, first_name, last_name, position, email, stats, labels, chart_filename="radar_chart.png")
         
         # Email content
         subject = "Growth Index Results"
