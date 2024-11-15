@@ -272,7 +272,7 @@ for section, questions in sections.items():
 # Submission and Score Calculation
 if st.button("Submit Survey"):
     if not company_name:
-        st.warning("Please provide the required Company Name.")
+        st.warning("Please provide the required Company Name on the left-side bar.")
     else:
         # Calculate scores
         scores = calculate_scores(responses)
